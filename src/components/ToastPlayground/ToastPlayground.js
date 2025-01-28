@@ -4,6 +4,8 @@ import Button from "../Button";
 
 import Toast from "../Toast/Toast";
 
+import ToastShelf from "../ToastShelf/ToastShelf";
+
 import styles from "./ToastPlayground.module.css";
 
 const VARIANT_OPTIONS = ["notice", "warning", "success", "error"];
@@ -11,12 +13,15 @@ const VARIANT_OPTIONS = ["notice", "warning", "success", "error"];
 function ToastPlayground() {
   const [textBox, setTextBox] = React.useState("");
   const [variant, setVariant] = React.useState("warning");
-  const [renderToast, setRenderToast] = React.useState(false);
-  const [toast, setToast] = React.useState("");
+  const [items, setItems] = React.useState([]);
 
-  function createNewPop(event) {
-    if (textBox == "") return;
-    setRenderToast(true);
+  function handleFormSubmit(event) {
+    event.preventDefault();
+    const userInput = { id: crypto.randomUUID(), textBox, variant };
+    const newItems = [...items, userInput];
+    setItems(newItems);
+    setTextBox("");
+    setVariant("notice");
   }
 
   return (
@@ -26,15 +31,14 @@ function ToastPlayground() {
         <h1>Toast Playground</h1>
       </header>
 
-      {renderToast && (
-        <Toast
-          textBox={textBox}
-          variant={variant}
-          setRenderToast={setRenderToast}
-        />
-      )}
+      <ToastShelf items={items} setItems={setItems} />
 
-      <div className={styles.controlsWrapper}>
+      <form
+        onSubmit={(event) => {
+          handleFormSubmit(event);
+        }}
+        className={styles.controlsWrapper}
+      >
         <div className={styles.row}>
           <label
             htmlFor="message"
@@ -45,6 +49,7 @@ function ToastPlayground() {
           </label>
           <div className={styles.inputWrapper}>
             <textarea
+              required
               id="message"
               className={styles.messageInput}
               value={textBox}
@@ -81,10 +86,10 @@ function ToastPlayground() {
         <div className={styles.row}>
           <div className={styles.label} />
           <div className={`${styles.inputWrapper} ${styles.radioWrapper}`}>
-            <Button onClick={createNewPop}>Pop Toast!</Button>
+            <Button>Pop Toast!</Button>
           </div>
         </div>
-      </div>
+      </form>
     </div>
   );
 }
